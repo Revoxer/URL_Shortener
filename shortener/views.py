@@ -1,6 +1,6 @@
 import secrets
 
-from django.http import HttpRequest
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.generic import TemplateView
@@ -11,10 +11,7 @@ from .models import URL
 class IndexView(TemplateView):
     template_name = "shortener/index.html"
 
-    def get_context_data(self: "IndexView", **kwargs: dict) -> dict:
-        return super().get_context_data(**kwargs)
-
-    def post(self: "IndexView", request: HttpRequest) -> render:
+    def post(self: "IndexView", request: HttpRequest) -> HttpResponse:
         original_url = request.POST.get("url")
         if original_url:
             short_code = self.generate_short_code()
@@ -31,7 +28,7 @@ class IndexView(TemplateView):
                 return code
 
 
-def redirect_url(_request: HttpRequest, short_code: str) -> redirect:
+def redirect_url(_request: HttpRequest, short_code: str) -> HttpResponse:
     url = URL.objects.get(short_code=short_code)
     url.click_count += 1
     url.save()
